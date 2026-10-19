@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rezeptschreiber-Helfer</title>
+  <style>
+    :root {
+      --bg1: #667eea;
+      --bg2: #764ba2;
+      --text: #2d3748;
+      --muted: #5f6c7b;
+      --accent: #f6ad55;
+      --accent-dark: #dd8a22;
+      --good: #48bb78;
+      --bad: #f56565;
+      --card: #ffffff;
+      --soft: #fff7ed;
+      --line: #e2e8f0;
+      --focus: #2b6cb0;
+      --radius: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    header {
+      padding: 24px 16px 10px;
+      text-align: center;
+      color: #ffffff;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 5vw, 3rem);
+    }
+
+    header p {
+      margin: 8px auto 0;
+      max-width: 760px;
+      font-size: 1.05rem;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 12px 0 36px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 1.35rem;
+    }
+
+    h3 {
+      margin: 16px 0 8px;
+      font-size: 1.1rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin: 10px 0 6px;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      min-height: 44px;
+      border: 2px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+      font: inherit;
+      color: var(--text);
+      background: #ffffff;
+    }
+
+    textarea {
+      min-height: 86px;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus,
+    button:focus {
+      outline: 4px solid rgba(43, 108, 176, 0.25);
+      border-color: var(--focus);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .row-three {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.4fr;
+      gap: 10px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    button {
+      min-height: 44px;
+      min-width: 44px;
+      border: 0;
+      border-radius: 14px;
+      padding: 10px 14px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      color: #1a202c;
+      background: var(--accent);
+      box-shadow: 0 4px 0 var(--accent-dark);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+    }
+
+    button:hover {
+      background: #fbd38d;
+    }
+
+    button:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 var(--accent-dark);
+    }
+
+    .secondary {
+      background: #edf2f7;
+      box-shadow: 0 4px 0 #cbd5e0;
+    }
+
+    .secondary:hover {
+      background: #f7fafc;
+    }
+
+    .danger {
+      background: #fed7d7;
+      box-shadow: 0 4px 0 #fc8181;
+    }
+
+    .good {
+      background: #c6f6d5;
+      box-shadow: 0 4px 0 #68d391;
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: var(--soft);
+      border: 1px solid #fbd38d;
+      font-weight: 700;
+    }
+
+    .pill button {
+      min-height: 30px;
+      min-width: 30px;
+      padding: 0 8px;
+      border-radius: 999px;
+      box-shadow: none;
+      background: #ffffff;
+      color: var(--bad);
+    }
+
+    .wordbank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .wordbank button {
+      background: #bee3f8;
+      box-shadow: 0 4px 0 #63b3ed;
+      font-weight: 700;
+    }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 40px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--line);
+      font-weight: 700;
+    }
+
+    .check {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      background: var(--bad);
+      flex: 0 0 auto;
+    }
+
+    .done .check {
+      background: var(--good);
+    }
+
+    .progress-wrap {
+      background: #edf2f7;
+      border-radius: 999px;
+      height: 20px;
+      overflow: hidden;
+      margin: 8px 0 12px;
+      border: 1px solid var(--line);
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #48bb78, #f6ad55);
+      transition: width 0.25s ease;
+    }
+
+    .feedback {
+      min-height: 44px;
+      padding: 12px;
+      border-radius: 14px;
+      background: #ebf8ff;
+      border: 2px solid #bee3f8;
+      font-weight: 700;
+    }
+
+    .preview {
+      white-space: pre-wrap;
+      background: #fffaf0;
+      border: 2px dashed #f6ad55;
+      border-radius: 16px;
+      padding: 14px;
+      min-height: 260px;
+      font-size: 1rem;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 6px;
+    }
+
+    .small {
+      font-size: 0.95rem;
+    }
+
+    .step-item {
+      background: #f7fafc;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px;
+      margin-top: 8px;
+    }
+
+    .step-item strong {
+      color: #2b6cb0;
+    }
+
+    .top-note {
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 860px) {
+      .grid,
+      .row,
+      .row-three {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        padding-top: 18px;
+      }
+    }
+
+    @media print {
+      body {
+        background: #ffffff;
+      }
+
+      header,
+      .no-print,
+      .left-column,
+      .top-note {
+        display: none !important;
+      }
+
+      main {
+        width: 100%;
+        padding: 0;
+      }
+
+      .grid {
+        display: block;
+      }
+
+      .card {
+        box-shadow: none;
+        border: 0;
+        padding: 0;
+      }
+
+      .preview {
+        border: 0;
+        background: #ffffff;
+        font-size: 12pt;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🍲 Rezeptschreiber-Helfer</h1>
+    <p>Plane dein Rezept Schritt für Schritt. Der Helfer baut daraus einen übersichtlichen Rezepttext.</p>
+  </header>
+
+  <main aria-label="Rezeptschreiber-Helfer">
+    <div class="top-note no-print">
+      Tipp: Du kannst erst sammeln und danach den fertigen Rezepttext verbessern. Mit <strong>Esc</strong> setzt du alles zurück.
+    </div>
+
+    <div class="grid">
+      <div class="left-column">
+        <section class="card" aria-labelledby="grunddaten-title">
+          <h2 id="grunddaten-title">1. Grunddaten</h2>
+
+          <label for="recipeName">Wie heißt dein Rezept?</label>
+          <input id="recipeName" type="text" aria-label="Rezeptname" placeholder="Zum Beispiel: Bunter Obstsalat">
+
+          <div class="row">
+            <div>
+              <label for="portions">Für wie viele Personen?</label>
+              <input id="portions" type="number" min="1" max="30" aria-label="Personenzahl" placeholder="4">
+            </div>
+            <div>
+              <label for="timeNeeded">Wie lange dauert es?</label>
+              <input id="timeNeeded" type="text" aria-label="Zubereitungszeit" placeholder="15 Minuten">
+            </div>
+          </div>
+
+          <label for="description">Kurzer Tipp oder Anlass</label>
+          <textarea id="description" aria-label="Kurzer Tipp zum Rezept" placeholder="Zum Beispiel: Das Rezept passt gut zu einem Klassenfrühstück."></textarea>
+        </section>
+
+        <section class="card" aria-labelledby="zutaten-title">
+          <h2 id="zutaten-title">2. Zutaten sammeln</h2>
+
+          <div class="row-three">
+            <div>
+              <label for="amountInput">Menge</label>
+              <input id="amountInput" type="text" aria-label="Menge" placeholder="2">
+            </div>
+            <div>
+              <label for="unitInput">Einheit</label>
+              <select id="unitInput" aria-label="Einheit"></select>
+            </div>
+            <div>
+              <label for="ingredientInput">Zutat</label>
+              <input id="ingredientInput" type="text" aria-label="Zutat" placeholder="Äpfel">
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="button" id="addIngredientBtn">Zutat hinzufügen</button>
+          </div>
+
+          <p class="hint">Tastatur-Tipp: Im Feld „Zutat“ kannst du Enter drücken.</p>
+          <ul id="ingredientList" class="pill-list" aria-label="Gesammelte Zutaten"></ul>
+        </section>
+
+        <section class="card" aria-labelledby="werkzeuge-title">
+          <h2 id="werkzeuge-title">3. Küchenwerkzeuge</h2>
+
+          <label for="toolInput">Was brauchst du?</label>
+          <input id="toolInput" type="text" aria-label="Küchenwerkzeug" placeholder="Schüssel">
+
+          <div class="wordbank" aria-label="Werkzeug-Vorschläge">
+            <button type="button" data-tool="Schüssel">Schüssel</button>
+            <button type="button" data-tool="Messer">Messer</button>
+            <button type="button" data-tool="Brettchen">Brettchen</button>
+            <button type="button" data-tool="Löffel">Löffel</button>
+            <button type="button" data-tool="Topf">Topf</button>
+            <button type="button" data-tool="Pfanne">Pfanne</button>
+          </div>
+
+          <div class="actions">
+            <button type="button" id="addToolBtn">Werkzeug hinzufügen</button>
+          </div>
+
+          <ul id="toolList" class="pill-list" aria-label="Gesammelte Küchenwerkzeuge"></ul>
+        </section>
+
+        <section class="card" aria-labelledby="schritte-title">
+          <h2 id="schritte-title">4. Zubereitung schreiben</h2>
+
+          <h3>Satzstarter</h3>
+          <div id="starterBank" class="wordbank" aria-label="Satzstarter"></div>
+
+          <h3>Tuwörter</h3>
+          <div id="verbBank" class="wordbank" aria-label="Tuwörter"></div>
+
+          <label for="stepInput">Nächster Schritt</label>
+          <textarea id="stepInput" aria-label="Zubereitungsschritt" placeholder="Was macht man zuerst?"></textarea>
+
+          <div class="actions">
+            <button type="button" id="addStepBtn">Schritt hinzufügen</button>
+            <button type="button" id="clearStepBtn" class="secondary">Schreibfeld leeren</button>
+          </div>
+
+          <div id="stepList" aria-label="Gesammelte Zubereitungsschritte"></div>
+        </section>
+
+        <section class="card no-print" aria-labelledby="aktionen-title">
+          <h2 id="aktionen-title">Aktionen</h2>
+          <div class="actions">
+            <button type="button" id="sampleBtn" class="good">Beispiel laden</button>
+            <button type="button" id="printBtn">Rezept drucken</button>
+            <button type="button" id="resetBtn" class="danger">Alles zurücksetzen</button>
+          </div>
+          <p class="hint">Die Datei speichert nichts im Internet. Alles bleibt auf dem Gerät.</p>
+        </section>
+      </div>
+
+      <div>
+        <section class="card no-print" aria-labelledby="feedback-title">
+          <h2 id="feedback-title">Fortschritt</h2>
+          <div class="progress-wrap" aria-label="Fortschrittsbalken">
+            <div id="progressBar" class="progress-bar"></div>
+          </div>
+          <ul id="checklist" class="checklist" aria-label="Rezept-Checkliste"></ul>
+          <div id="feedbackBox" class="feedback" aria-live="polite">Starte mit einem Rezeptnamen.</div>
+        </section>
+
+        <section class="card" aria-labelledby="vorschau-title">
+          <h2 id="vorschau-title">Fertiger Rezepttext</h2>
+          <div id="preview" class="preview" aria-live="polite" aria-label="Vorschau des Rezepttextes"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // =========================
+    // HIER BEARBEITEN (Settings)
+    // =========================
+    var SETTINGS = {
+      minIngredients: 3, // Mindestanzahl der Zutaten für die Checkliste
+      minTools: 2, // Mindestanzahl der Küchenwerkzeuge für die Checkliste
+      minSteps: 3, // Mindestanzahl der Zubereitungsschritte für die Checkliste
+      defaultPortions: 4, // Vorgabe für die Personenzahl beim Start
+      defaultTimeText: "15 Minuten", // Vorgabe für die Zubereitungszeit beim Start
+      showDescriptionSection: true, // Zusatztext in der Vorschau anzeigen: true = ja, false = nein
+      units: ["Stück", "g", "kg", "ml", "l", "EL", "TL", "Prise", "Packung", "Tasse", "Becher"],
+      sentenceStarters: ["Zuerst", "Danach", "Nun", "Anschließend", "Jetzt", "Zum Schluss", "Wenn alles fertig ist"],
+      actionWords: ["waschen", "schneiden", "rühren", "mischen", "kochen", "braten", "backen", "schälen", "gießen", "verteilen", "servieren"],
+      sampleRecipeName: "Bunter Obstsalat", // Name des Beispielrezepts
+      samplePortions: "4", // Personenzahl des Beispielrezepts
+      sampleTime: "15 Minuten", // Zeit des Beispielrezepts
+      sampleDescription: "Der Obstsalat passt gut zu einem Klassenfrühstück.",
+      sampleIngredients: [
+        { amount: "2", unit: "Stück", name: "Äpfel" },
+        { amount: "2", unit: "Stück", name: "Bananen" },
+        { amount: "1", unit: "Tasse", name: "Trauben" },
+        { amount: "1", unit: "EL", name: "Zitronensaft" }
+      ],
+      sampleTools: ["Schüssel", "Messer", "Brettchen", "Löffel"],
+      sampleSteps: [
+        "Zuerst wäschst du das Obst gründlich.",
+        "Danach schneidest du Äpfel und Bananen in kleine Stücke.",
+        "Nun gibst du alles in eine Schüssel und mischst es vorsichtig.",
+        "Zum Schluss gibst du etwas Zitronensaft dazu und servierst den Obstsalat."
+      ]
+    };
+
+    var ingredients = [];
+    var tools = [];
+    var steps = [];
+
+    var recipeName = document.getElementById("recipeName");
+    var portions = document.getElementById("portions");
+    var timeNeeded = document.getElementById("timeNeeded");
+    var description = document.getElementById("description");
+    var amountInput = document.getElementById("amountInput");
+    var unitInput = document.getElementById("unitInput");
+    var ingredientInput = document.getElementById("ingredientInput");
+    var toolInput = document.getElementById("toolInput");
+    var stepInput = document.getElementById("stepInput");
+
+    var ingredientList = document.getElementById("ingredientList");
+    var toolList = document.getElementById("toolList");
+    var stepList = document.getElementById("stepList");
+    var preview = document.getElementById("preview");
+    var checklist = document.getElementById("checklist");
+    var progressBar = document.getElementById("progressBar");
+    var feedbackBox = document.getElementById("feedbackBox");
+    var starterBank = document.getElementById("starterBank");
+    var verbBank = document.getElementById("verbBank");
+
+    function trimText(str) {
+      return String(str || "").replace(/^\s+|\s+$/g, "");
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function addPeriod(str) {
+      var text = trimText(str);
+      var last = text.charAt(text.length - 1);
+      if (text.length === 0) {
+        return "";
+      }
+      if (last === "." || last === "!" || last === "?") {
+        return text;
+      }
+      return text + ".";
+    }
+
+    function fillUnits() {
+      var html = "";
+      var i;
+      for (i = 0; i < SETTINGS.units.length; i++) {
+        html += "<option value=\"" + escapeHtml(SETTINGS.units[i]) + "\">" + escapeHtml(SETTINGS.units[i]) + "</option>";
+      }
+      unitInput.innerHTML = html;
+    }
+
+    function makeWordButtons(container, words, targetInput) {
+      var i;
+      var button;
+      container.innerHTML = "";
+      for (i = 0; i < words.length; i++) {
+        button = document.createElement("button");
+        button.type = "button";
+        button.appendChild(document.createTextNode(words[i]));
+        button.setAttribute("aria-label", "Wort einfügen: " + words[i]);
+        button.onclick = (function(word) {
+          return function() {
+            insertWord(targetInput, word);
+          };
+        })(words[i]);
+        container.appendChild(button);
+      }
+    }
+
+    function insertWord(input, word) {
+      var current = trimText(input.value);
+      if (current.length === 0) {
+        input.value = word + " ";
+      } else {
+        input.value = current + " " + word + " ";
+      }
+      input.focus();
+      updateAll();
+    }
+
+    function addIngredient() {
+      var amount = trimText(amountInput.value);
+      var unit = trimText(unitInput.value);
+      var name = trimText(ingredientInput.value);
+
+      if (name.length === 0) {
+        feedbackBox.textContent = "Bitte trage zuerst eine Zutat ein.";
+        ingredientInput.focus();
+        return;
+      }
+
+      ingredients.push({
+        amount: amount,
+        unit: unit,
+        name: name
+      });
+
+      amountInput.value = "";
+      ingredientInput.value = "";
+      amountInput.focus();
+      updateAll();
+    }
+
+    function removeIngredient(index) {
+      ingredients.splice(index, 1);
+      updateAll();
+    }
+
+    function addTool(toolText) {
+      var name = trimText(toolText || toolInput.value);
+      var i;
+
+      if (name.length === 0) {
+        feedbackBox.textContent = "Bitte trage zuerst ein Küchenwerkzeug ein.";
+        toolInput.focus();
+        return;
+      }
+
+      for (i = 0; i < tools.length; i++) {
+        if (tools[i].toLowerCase() === name.toLowerCase()) {
+          feedbackBox.textContent = "Dieses Werkzeug steht schon in deiner Liste.";
+          toolInput.focus();
+          return;
+        }
+      }
+
+      tools.push(name);
+      toolInput.value = "";
+      toolInput.focus();
+      updateAll();
+    }
+
+    function removeTool(index) {
+      tools.splice(index, 1);
+      updateAll();
+    }
+
+    function addStep() {
+      var text = addPeriod(stepInput.value);
+
+      if (text.length === 0) {
+        feedbackBox.textContent = "Bitte schreibe zuerst einen Zubereitungsschritt.";
+        stepInput.focus();
+        return;
+      }
+
+      steps.push(text);
+      stepInput.value = "";
+      stepInput.focus();
+      updateAll();
+    }
+
+    function removeStep(index) {
+      steps.splice(index, 1);
+      updateAll();
+    }
+
+    function renderIngredients() {
+      var html = "";
+      var i;
+      var item;
+      var text;
+
+      for (i = 0; i < ingredients.length; i++) {
+        item = ingredients[i];
+        text = "";
+        if (item.amount.length > 0) {
+          text += item.amount + " ";
+        }
+        if (item.unit.length > 0) {
+          text += item.unit + " ";
+        }
+        text += item.name;
+
+        html += "<li class=\"pill\">" + escapeHtml(text) +
+          " <button type=\"button\" aria-label=\"Zutat entfernen\" data-remove-ingredient=\"" + i + "\">×</button></li>";
+      }
+
+      ingredientList.innerHTML = html;
+      bindRemoveButtons();
+    }
+
+    function renderTools() {
+      var html = "";
+      var i;
+
+      for (i = 0; i < tools.length; i++) {
+        html += "<li class=\"pill\">" + escapeHtml(tools[i]) +
+          " <button type=\"button\" aria-label=\"Werkzeug entfernen\" data-remove-tool=\"" + i + "\">×</button></li>";
+      }
+
+      toolList.innerHTML = html;
+      bindRemoveButtons();
+    }
+
+    function renderSteps() {
+      var html = "";
+      var i;
+
+      for (i = 0; i < steps.length; i++) {
+        html += "<div class=\"step-item\"><strong>Schritt " + (i + 1) + ":</strong> " +
+          escapeHtml(steps[i]) +
+          " <button type=\"button\" class=\"secondary\" aria-label=\"Schritt entfernen\" data-remove-step=\"" + i + "\">Entfernen</button></div>";
+      }
+
+      stepList.innerHTML = html;
+      bindRemoveButtons();
+    }
+
+    function bindRemoveButtons() {
+      var ingredientButtons = document.querySelectorAll("[data-remove-ingredient]");
+      var toolButtons = document.querySelectorAll("[data-remove-tool]");
+      var stepButtons = document.querySelectorAll("[data-remove-step]");
+      var i;
+
+      for (i = 0; i < ingredientButtons.length; i++) {
+        ingredientButtons[i].onclick = function() {
+          removeIngredient(parseInt(this.getAttribute("data-remove-ingredient"), 10));
+        };
+      }
+
+      for (i = 0; i < toolButtons.length; i++) {
+        toolButtons[i].onclick = function() {
+          removeTool(parseInt(this.getAttribute("data-remove-tool"), 10));
+        };
+      }
+
+      for (i = 0; i < stepButtons.length; i++) {
+        stepButtons[i].onclick = function() {
+          removeStep(parseInt(this.getAttribute("data-remove-step"), 10));
+        };
+      }
+    }
+
+    function makeRecipeText() {
+      var title = trimText(recipeName.value);
+      var people = trimText(portions.value);
+      var time = trimText(timeNeeded.value);
+      var desc = trimText(description.value);
+      var text = "";
+      var i;
+      var item;
+      var line;
+
+      if (title.length === 0) {
+        title = "Mein Rezept";
+      }
+
+      text += title + "\n";
+      text += "====================\n\n";
+
+      if (people.length > 0) {
+        text += "Für: " + people + " Personen\n";
+      }
+
+      if (time.length > 0) {
+        text += "Dauer: " + time + "\n";
+      }
+
+      if (SETTINGS.showDescriptionSection && desc.length > 0) {
+        text += "\nTipp:\n" + desc + "\n";
+      }
+
+      text += "\nZutaten:\n";
+      if (ingredients.length === 0) {
+        text += "- Trage hier deine Zutaten ein.\n";
+      } else {
+        for (i = 0; i < ingredients.length; i++) {
+          item = ingredients[i];
+          line = "- ";
+          if (item.amount.length > 0) {
+            line += item.amount + " ";
+          }
+          if (item.unit.length > 0) {
+            line += item.unit + " ";
+          }
+          line += item.name;
+          text += line + "\n";
+        }
+      }
+
+      text += "\nKüchenwerkzeuge:\n";
+      if (tools.length === 0) {
+        text += "- Trage hier deine Werkzeuge ein.\n";
+      } else {
+        for (i = 0; i < tools.length; i++) {
+          text += "- " + tools[i] + "\n";
+        }
+      }
+
+      text += "\nZubereitung:\n";
+      if (steps.length === 0) {
+        text += "1. Schreibe hier den ersten Schritt.\n";
+      } else {
+        for (i = 0; i < steps.length; i++) {
+          text += (i + 1) + ". " + steps[i] + "\n";
+        }
+      }
+
+      text += "\nGuten Appetit!";
+      return text;
+    }
+
+    function updateChecklist() {
+      var items = [
+        {
+          label: "Das Rezept hat einen Namen.",
+          done: trimText(recipeName.value).length > 0
+        },
+        {
+          label: "Die Personenzahl ist eingetragen.",
+          done: trimText(portions.value).length > 0
+        },
+        {
+          label: "Die Dauer ist eingetragen.",
+          done: trimText(timeNeeded.value).length > 0
+        },
+        {
+          label: "Mindestens " + SETTINGS.minIngredients + " Zutaten sind gesammelt.",
+          done: ingredients.length >= SETTINGS.minIngredients
+        },
+        {
+          label: "Mindestens " + SETTINGS.minTools + " Küchenwerkzeuge sind gesammelt.",
+          done: tools.length >= SETTINGS.minTools
+        },
+        {
+          label: "Mindestens " + SETTINGS.minSteps + " Zubereitungsschritte sind geschrieben.",
+          done: steps.length >= SETTINGS.minSteps
+        }
+      ];
+
+      var doneCount = 0;
+      var html = "";
+      var i;
+      var percent;
+
+      for (i = 0; i < items.length; i++) {
+        if (items[i].done) {
+          doneCount++;
+          html += "<li class=\"done\"><span class=\"check\">✓</span><span>" + escapeHtml(items[i].label) + "</span></li>";
+        } else {
+          html += "<li><span class=\"check\">!</span><span>" + escapeHtml(items[i].label) + "</span></li>";
+        }
+      }
+
+      checklist.innerHTML = html;
+      percent = Math.round((doneCount / items.length) * 100);
+      progressBar.style.width = percent + "%";
+
+      if (doneCount === items.length) {
+        feedbackBox.textContent = "Super! Dein Rezept ist vollständig. Lies es noch einmal langsam durch.";
+      } else if (doneCount >= 4) {
+        feedbackBox.textContent = "Fast fertig! Prüfe die offenen Punkte in der Liste.";
+      } else if (doneCount >= 2) {
+        feedbackBox.textContent = "Gut angefangen! Ergänze jetzt Zutaten, Werkzeuge und Schritte.";
+      } else {
+        feedbackBox.textContent = "Starte mit dem Namen, der Dauer und den Personen.";
+      }
+    }
+
+    function updateAll() {
+      renderIngredients();
+      renderTools();
+      renderSteps();
+      preview.textContent = makeRecipeText();
+      updateChecklist();
+    }
+
+    function loadSample() {
+      var i;
+
+      recipeName.value = SETTINGS.sampleRecipeName;
+      portions.value = SETTINGS.samplePortions;
+      timeNeeded.value = SETTINGS.sampleTime;
+      description.value = SETTINGS.sampleDescription;
+
+      ingredients = [];
+      for (i = 0; i < SETTINGS.sampleIngredients.length; i++) {
+        ingredients.push({
+          amount: SETTINGS.sampleIngredients[i].amount,
+          unit: SETTINGS.sampleIngredients[i].unit,
+          name: SETTINGS.sampleIngredients[i].name
+        });
+      }
+
+      tools = [];
+      for (i = 0; i < SETTINGS.sampleTools.length; i++) {
+        tools.push(SETTINGS.sampleTools[i]);
+      }
+
+      steps = [];
+      for (i = 0; i < SETTINGS.sampleSteps.length; i++) {
+        steps.push(SETTINGS.sampleSteps[i]);
+      }
+
+      updateAll();
+      recipeName.focus();
+    }
+
+    function resetAll() {
+      var ok = window.confirm("Möchtest du wirklich alles zurücksetzen?");
+      if (!ok) {
+        return;
+      }
+
+      recipeName.value = "";
+      portions.value = SETTINGS.defaultPortions;
+      timeNeeded.value = SETTINGS.defaultTimeText;
+      description.value = "";
+      amountInput.value = "";
+      ingredientInput.value = "";
+      toolInput.value = "";
+      stepInput.value = "";
+      ingredients = [];
+      tools = [];
+      steps = [];
+      updateAll();
+      recipeName.focus();
+    }
+
+    function bindEvents() {
+      document.getElementById("addIngredientBtn").onclick = addIngredient;
+      document.getElementById("addToolBtn").onclick = function() {
+        addTool("");
+      };
+      document.getElementById("addStepBtn").onclick = addStep;
+      document.getElementById("clearStepBtn").onclick = function() {
+        stepInput.value = "";
+        stepInput.focus();
+        updateAll();
+      };
+      document.getElementById("sampleBtn").onclick = loadSample;
+      document.getElementById("printBtn").onclick = function() {
+        window.print();
+      };
+      document.getElementById("resetBtn").onclick = resetAll;
+
+      recipeName.oninput = updateAll;
+      portions.oninput = updateAll;
+      timeNeeded.oninput = updateAll;
+      description.oninput = updateAll;
+      amountInput.oninput = updateAll;
+      unitInput.onchange = updateAll;
+      ingredientInput.oninput = updateAll;
+      toolInput.oninput = updateAll;
+      stepInput.oninput = updateAll;
+
+      ingredientInput.onkeydown = function(event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          addIngredient();
+        }
+      };
+
+      toolInput.onkeydown = function(event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          addTool("");
+        }
+      };
+
+      stepInput.onkeydown = function(event) {
+        if (event.key === "Enter" && event.ctrlKey) {
+          event.preventDefault();
+          addStep();
+        }
+      };
+
+      document.onkeydown = function(event) {
+        if (event.key === "Escape") {
+          resetAll();
+        }
+      };
+
+      var toolButtons = document.querySelectorAll("[data-tool]");
+      var i;
+      for (i = 0; i < toolButtons.length; i++) {
+        toolButtons[i].onclick = function() {
+          addTool(this.getAttribute("data-tool"));
+        };
+      }
+    }
+
+    function init() {
+      fillUnits();
+      makeWordButtons(starterBank, SETTINGS.sentenceStarters, stepInput);
+      makeWordButtons(verbBank, SETTINGS.actionWords, stepInput);
+      portions.value = SETTINGS.defaultPortions;
+      timeNeeded.value = SETTINGS.defaultTimeText;
+      bindEvents();
+      updateAll();
+      recipeName.focus();
+    }
+
+    init();
+  </script>
+</body>
+</html>
